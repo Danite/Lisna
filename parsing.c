@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "mpc.h"
 
@@ -32,6 +33,9 @@ long eval_op(long x, char* op, long y) {
     if (strcmp(op, "-") == 0) { return x - y; }
     if (strcmp(op, "*") == 0) { return x * y; }
     if (strcmp(op, "/") == 0) { return x / y; }
+    if (strcmp(op, "%") == 0) { return x % y; }
+    if (strcmp(op, "min") == 0) { return fmin(x, y); }
+    if (strcmp(op, "max") == 0) { return fmax(x, y); }
     return 0;
 }
 
@@ -42,7 +46,6 @@ long eval(mpc_ast_t* t) {
     }
 
     char* op = t->children[1]->contents;
-
     long x = eval(t->children[2]);
 
     int i = 3;
@@ -65,11 +68,11 @@ int main(int argc, char** argv) {
     mpc_parser_t* Lisna = mpc_new("lisna");
 
     mpca_lang(MPCA_LANG_DEFAULT,
-    "                                                     \
-        number   : /-?[0-9]+/ ;                             \
-        operator : '+' | '-' | '*' | '/' ;                  \
-        expr     : <number> | '(' <operator> <expr>+ ')' ;  \
-        lisna    : /^/ <operator> <expr>+ /$/ ;             \
+    "                                                                   \
+        number   : /-?[0-9]+/ ;                                         \
+        operator : '+' | '-' | '*' | '/' | '%' | /min/ | /max/ ;        \
+        expr     : <number> | '(' <operator> <expr>+ ')' ;              \
+        lisna    : /^/ <operator> <expr>+ /$/ ;                         \
     ",
     Number, Operator, Expr, Lisna);
 
